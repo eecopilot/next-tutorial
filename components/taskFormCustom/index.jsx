@@ -1,7 +1,9 @@
 'use client';
-import { useRef } from 'react';
+import { useEffect } from 'react';
+// import { useRef } from 'react';
 import { createTaskCustom } from '../../utils/actions';
-import { useFormStatus } from 'react-dom';
+import { useFormStatus, useFormState } from 'react-dom';
+import { toast } from 'react-hot-toast';
 
 const SubmitButton = () => {
   const { pending: isSubmitting } = useFormStatus();
@@ -14,17 +16,24 @@ const SubmitButton = () => {
     </button>
   );
 };
-
+const initialState = {
+  message: '',
+};
 const TaskFormCustom = () => {
-  const ref = useRef(null);
-
+  // const ref = useRef(null);
+  const [state, formAction] = useFormState(createTaskCustom, initialState);
+  useEffect(() => {
+    if (state.message === 'error') {
+      toast.error('error');
+      return;
+    }
+    if (state.message) {
+      toast.success('success');
+    }
+  }, [state]);
   return (
-    <form
-      ref={ref}
-      action={async (formData) => {
-        await createTaskCustom(formData);
-        ref.current?.reset();
-      }}>
+    <form action={formAction}>
+      {/* {state.message ? <p className='mb-2'>{state.message}</p> : null} */}
       <div className='join w-full'>
         <input
           type='text'
